@@ -21,6 +21,7 @@ def load_gateway_configs(config_path: str | Path) -> list[GatewayConfig]:
             port=item.get("port", 502),
             slave_id=item.get("slave_id", 1),
             poll_interval_ms=item.get("poll_interval_ms", 1000),
+            sensor_count=item.get("sensor_count", 16),
         )
         for item in payload
     ]

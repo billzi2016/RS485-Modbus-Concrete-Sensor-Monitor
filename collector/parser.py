@@ -6,8 +6,7 @@ from collector.models import SensorSnapshot
 def parse_sensor_block(data_area: bytes, gateway_ip: str, sensor_index: int, ts: int) -> SensorSnapshot:
     """
     按 PRD 里的 14 字节布局解析单个传感器块。
-
-    这里保留整型位移解算方式，不依赖 float 字节序。
+    sensor_index 为 0-based 输入，SensorSnapshot.sensor_index 存 1-based。
     """
     offset = sensor_index * 14
     raw_freq = (data_area[offset] << 8) | data_area[offset + 1]
@@ -35,9 +34,12 @@ def parse_sensor_block(data_area: bytes, gateway_ip: str, sensor_index: int, ts:
         scaled_max_strain -= 0x100000000
 
     status = (data_area[offset + 12] << 8) | data_area[offset + 13]
+    idx_1based = sensor_index + 1
 
     return SensorSnapshot(
-        key=f"{gateway_ip}_1_{sensor_index + 1}",
+        key=f"{gateway_ip}_1_{idx_1based}",
+        gateway_ip=gateway_ip,
+        sensor_index=idx_1based,
         raw_freq=raw_freq,
         strain=scaled_strain / 1000.0,
         temp=scaled_temp / 100.0,

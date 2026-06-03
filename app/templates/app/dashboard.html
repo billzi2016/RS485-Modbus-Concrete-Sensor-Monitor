@@ -14,14 +14,10 @@
                 <div class="brand-title-row">
                     <div class="brand-title">混凝土应变实时监测系统</div>
                     <div class="brand-actions">
-                        <div class="mock-switch-group">
-                            <span class="mock-side-label is-active" id="mock-label-left">真实数据</span>
-                            <button type="button" class="mock-toggle is-off" id="mock-toggle-button" aria-pressed="false" aria-label="数据源切换">
-                                <span class="mock-toggle-track">
-                                    <span class="mock-toggle-thumb"></span>
-                                </span>
-                            </button>
-                            <span class="mock-side-label" id="mock-toggle-label">测试数据</span>
+                        <div class="source-switch-group" id="source-switch-group" role="group" aria-label="数据源">
+                            <button type="button" class="source-btn is-active" data-source="real">真实数据</button>
+                            <button type="button" class="source-btn" data-source="fastapi">网络模拟</button>
+                            <button type="button" class="source-btn" data-source="mock">本地模拟</button>
                         </div>
                     </div>
                 </div>
@@ -106,6 +102,6 @@
         </main>
     </div>
 
-    <script src="{% static 'app/js/dashboard.js' %}"></script>
+    <script src="{% static 'app/js/dashboard.js' %}?v=3"></script>
 </body>
 </html>

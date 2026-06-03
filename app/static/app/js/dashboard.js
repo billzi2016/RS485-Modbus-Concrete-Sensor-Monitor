@@ -10,6 +10,7 @@
         freq: "频率",
     };
 
+    // dataSource: "real" | "fastapi" | "mock"
     const state = {
         currentMetric: defaultMetric,
         selectedGatewayIp: null,
@@ -17,7 +18,7 @@
         selectedSensorKey: null,
         sparklineHistory: {},
         currentRange: { min: 0, max: 1 },
-        mockEnabled: false,
+        dataSource: "real",
     };
 
     const summaryOnline = document.getElementById("summary-online");
@@ -33,9 +34,20 @@
     const historyLine = document.getElementById("history-line");
     const chartMinLabel = document.getElementById("chart-min-label");
     const chartMaxLabel = document.getElementById("chart-max-label");
-    const mockToggleButton = document.getElementById("mock-toggle-button");
-    const mockToggleLabel = document.getElementById("mock-toggle-label");
-    const mockLabelLeft = document.getElementById("mock-label-left");
+    const sourceBtns = document.querySelectorAll(".source-btn");
+
+    function sourceParam() {
+        if (state.dataSource === "mock") return "?source=mock";
+        if (state.dataSource === "fastapi") return "?source=fastapi";
+        return "";
+    }
+
+    function setDataSource(source) {
+        state.dataSource = source;
+        sourceBtns.forEach((btn) => {
+            btn.classList.toggle("is-active", btn.dataset.source === source);
+        });
+    }
 
     function formatMetricValue(value) {
         if (value === null || value === undefined) {
@@ -72,25 +84,13 @@
     }
 
     async function refreshSummary() {
-        if (!state.mockEnabled) {
-            return;
-        }
-        const data = await fetchJson("/api/summary");
+        const data = await fetchJson("/api/summary" + sourceParam());
         summaryOnline.textContent = data.gateway_online;
         summaryOffline.textContent = data.gateway_offline;
         summaryError.textContent = data.error_sensors;
         summarySensors.textContent = data.sensor_total;
         dataSource.textContent = data.source || "unknown";
         lastUpdated.textContent = formatTimestamp(data.last_updated);
-    }
-
-    function setMockToggleState(enabled) {
-        state.mockEnabled = enabled;
-        mockToggleButton.classList.toggle("is-on", enabled);
-        mockToggleButton.classList.toggle("is-off", !enabled);
-        mockToggleButton.setAttribute("aria-pressed", enabled ? "true" : "false");
-        mockLabelLeft.classList.toggle("is-active", !enabled);
-        mockToggleLabel.classList.toggle("is-active", enabled);
     }
 
     function updateSparklineHistory(cellData) {
@@ -276,49 +276,25 @@
     }
 
     async function refreshMatrix() {
-        if (!state.mockEnabled) {
-            return;
-        }
-        const data = await fetchJson(`/api/matrix/${state.currentMetric}`);
+        const data = await fetchJson(`/api/matrix/${state.currentMetric}${sourceParam()}`);
         renderMatrix(data);
         dataSource.textContent = data.source || dataSource.textContent;
     }
 
     function refreshHistory() {
-        if (!state.mockEnabled) {
-            return;
-        }
         renderHistory();
     }
 
-    function clearDashboard() {
-        summaryOnline.textContent = "0";
-        summaryOffline.textContent = "0";
-        summaryError.textContent = "0";
-        summarySensors.textContent = "0";
-        currentMetricLabel.textContent = metricLabels[state.currentMetric] || state.currentMetric;
-        metricRange.textContent = "0 ~ 0";
-        dataSource.textContent = "mock-off";
-        lastUpdated.textContent = "--";
-        matrixBody.innerHTML = `<div class="loading-row">模拟数据已关闭</div>`;
-        detailMeta.textContent = "模拟数据已关闭";
-        chartMinLabel.textContent = "0";
-        chartMaxLabel.textContent = "0";
-        historyLine.setAttribute("points", "");
+    async function switchDataSource(source) {
+        if (source === state.dataSource) return;
+        setDataSource(source);
+
+        // 切换数据源时清空历史，避免不同来源的曲线混叠
+        state.sparklineHistory = {};
         state.selectedGatewayIp = null;
         state.selectedSensorIndex = null;
         state.selectedSensorKey = null;
-        state.sparklineHistory = {};
-    }
-
-    async function toggleMockMode() {
-        const nextEnabled = !state.mockEnabled;
-        setMockToggleState(nextEnabled);
-
-        if (!nextEnabled) {
-            clearDashboard();
-            return;
-        }
+        matrixBody.innerHTML = `<div class="loading-row">切换中…</div>`;
 
         try {
             await refreshSummary();
@@ -326,6 +302,7 @@
             refreshHistory();
         } catch (error) {
             console.error(error);
+            matrixBody.innerHTML = `<div class="loading-row">加载失败: ${error.message}</div>`;
         }
     }
 
@@ -344,15 +321,24 @@
             });
         });
 
-        mockToggleButton.addEventListener("click", () => {
-            toggleMockMode().catch(console.error);
+        sourceBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                switchDataSource(btn.dataset.source).catch(console.error);
+            });
         });
     }
 
     async function boot() {
-        setMockToggleState(false);
-        clearDashboard();
+        setDataSource("real");
         bindTabs();
+
+        try {
+            await refreshSummary();
+            await refreshMatrix();
+            refreshHistory();
+        } catch (error) {
+            matrixBody.innerHTML = `<div class="loading-row">加载失败: ${error.message}</div>`;
+        }
 
         window.setInterval(() => {
             refreshSummary().catch(console.error);

@@ -56,63 +56,43 @@ body {
     flex: 0 0 auto;
 }
 
-.mock-switch-group {
+.source-switch-group {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
+    background: #dcdcdc;
+    border-radius: 6px;
+    padding: 2px;
     flex: 0 0 auto;
 }
 
-.mock-toggle {
-    border: 0;
+.source-btn {
+    border: none;
     background: transparent;
-    padding: 0;
-    cursor: pointer;
+    padding: 4px 14px;
+    border-radius: 4px;
     font: inherit;
-    display: inline-flex;
-    align-items: center;
-}
-
-.mock-toggle-track {
-    position: relative;
-    width: 52px;
-    height: 24px;
-    border: 1px solid #6d6d6d;
-    background: #d94040;
-    border-radius: 999px;
-    box-sizing: border-box;
-}
-
-.mock-toggle-thumb {
-    position: absolute;
-    top: 2px;
-    left: 28px;
-    width: 18px;
-    height: 18px;
-    border: 1px solid #7f7f7f;
-    background: #ffffff;
-    box-sizing: border-box;
-    border-radius: 999px;
-}
-
-.mock-side-label {
-    display: inline-block;
-    white-space: nowrap;
-    color: #aaaaaa;
     font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #777777;
+    white-space: nowrap;
+    transition: background 0.12s, color 0.12s;
 }
 
-.mock-side-label.is-active {
-    color: #111111;
-    font-weight: 700;
-}
-
-.mock-toggle.is-off .mock-toggle-track {
+.source-btn[data-source="real"].is-active {
     background: #4fa55b;
+    color: #ffffff;
 }
 
-.mock-toggle.is-off .mock-toggle-thumb {
-    left: 2px;
+.source-btn[data-source="fastapi"].is-active {
+    background: #d98b30;
+    color: #ffffff;
+}
+
+.source-btn[data-source="mock"].is-active {
+    background: #d94040;
+    color: #ffffff;
 }
 
 .brand-subtitle {

@@ -12,7 +12,8 @@ METRIC_RANGES: dict[MetricName, tuple[float, float]] = {
     "max_strain": (-10000.0, 10000.0),
 }
 
-KEY_PREFIX = "monitor:sensor"
+KEY_PREFIX_REAL = "monitor:sensor"   # 真实 collector 写入
+KEY_PREFIX_TEST = "monitor:test"     # mock_server --feed 写入
 
 
 class RedisReader:
@@ -33,14 +34,14 @@ class RedisReader:
             )
         return self._client
 
-    def _sensor_key(self, gateway_ip: str, sensor_index: int) -> str:
-        return f"{KEY_PREFIX}:{gateway_ip}:{sensor_index}"
+    def _sensor_key(self, gateway_ip: str, sensor_index: int, key_prefix: str = KEY_PREFIX_REAL) -> str:
+        return f"{key_prefix}:{gateway_ip}:{sensor_index}"
 
     def _gateways(self) -> list[str]:
         from django.conf import settings
         return [f"10.54.79.{201 + i}" for i in range(settings.MONITOR_GATEWAY_COUNT)]
 
-    def get_summary(self) -> dict[str, object]:
+    def get_summary(self, key_prefix: str = KEY_PREFIX_REAL) -> dict[str, object]:
         from django.conf import settings
         client = self._client_()
         online_gateways = 0
@@ -50,7 +51,7 @@ class RedisReader:
         for gateway_ip in self._gateways():
             gateway_online = False
             for sensor_index in range(1, settings.MONITOR_SENSOR_COUNT + 1):
-                raw = client.get(self._sensor_key(gateway_ip, sensor_index))
+                raw = client.get(self._sensor_key(gateway_ip, sensor_index, key_prefix))
                 if raw:
                     snap = json.loads(raw)
                     if snap.get("online"):
@@ -61,6 +62,7 @@ class RedisReader:
             if gateway_online:
                 online_gateways += 1
 
+        source_label = "redis" if key_prefix == KEY_PREFIX_REAL else "fastapi"
         return {
             "gateway_total": settings.MONITOR_GATEWAY_COUNT,
             "gateway_online": online_gateways,
@@ -68,10 +70,10 @@ class RedisReader:
             "sensor_total": settings.MONITOR_GATEWAY_COUNT * settings.MONITOR_SENSOR_COUNT,
             "error_sensors": error_sensors,
             "last_updated": last_ts or None,
-            "source": "redis",
+            "source": source_label,
         }
 
-    def get_matrix(self, metric: MetricName) -> dict[str, object]:
+    def get_matrix(self, metric: MetricName, key_prefix: str = KEY_PREFIX_REAL) -> dict[str, object]:
         from django.conf import settings
         client = self._client_()
         metric_range = METRIC_RANGES.get(metric, (-1.0, 1.0))
@@ -80,7 +82,7 @@ class RedisReader:
         for gateway_ip in self._gateways():
             cells = []
             for sensor_index in range(1, settings.MONITOR_SENSOR_COUNT + 1):
-                raw = client.get(self._sensor_key(gateway_ip, sensor_index))
+                raw = client.get(self._sensor_key(gateway_ip, sensor_index, key_prefix))
                 if raw:
                     snap = json.loads(raw)
                     value = snap.get(metric)
@@ -109,11 +111,12 @@ class RedisReader:
                 "range": {"min": metric_range[0], "max": metric_range[1]},
             })
 
+        source_label = "redis" if key_prefix == KEY_PREFIX_REAL else "fastapi"
         return {
             "metric": metric,
             "range": {"min": metric_range[0], "max": metric_range[1]},
             "rows": rows,
-            "source": "redis",
+            "source": source_label,
         }
 
     def get_history(self, gateway_ip: str, sensor_index: int, metric: MetricName) -> dict[str, object]:

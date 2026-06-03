@@ -272,11 +272,16 @@ def history(
     }
 
 
+# HTTP 接口仍用旧前缀（仅供压测），--feed 写入独立的 test 命名空间
 KEY_PREFIX = "monitor:sensor"
+KEY_PREFIX_FEED = "monitor:test"
 
 
 async def feed_redis(redis_url: str, interval: float) -> None:
-    """循环向 Redis 写入所有网关传感器快照，模拟 RS485 collector 的数据推送。"""
+    """
+    循环向 Redis 写入所有网关传感器快照，写入 monitor:test: 命名空间。
+    Django 前端选 FastAPI 模式时从此命名空间读取，与真实 collector 数据互不干扰。
+    """
     client = aioredis.from_url(redis_url, decode_responses=True)
     try:
         while True:
@@ -287,8 +292,7 @@ async def feed_redis(redis_url: str, interval: float) -> None:
                     snapshot = build_sensor_snapshot(
                         gateway_ip, gateway_index, sensor_index, now
                     )
-                    # key 使用 1-based sensor_index 与 RedisReader 保持一致
-                    key = f"{KEY_PREFIX}:{gateway_ip}:{sensor_index + 1}"
+                    key = f"{KEY_PREFIX_FEED}:{gateway_ip}:{sensor_index + 1}"
                     pipe.set(key, json.dumps(snapshot), ex=10)
             await pipe.execute()
             await asyncio.sleep(interval)

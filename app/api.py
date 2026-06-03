@@ -11,23 +11,21 @@ api = NinjaAPI(title="RS485 Monitor API")
 
 @api.get("/health")
 def health(request) -> dict[str, str]:
-    """最小健康检查接口，用于确认 Django Ninja 已成功接入。"""
     return {"status": "ok"}
 
 
 @api.get("/summary")
-def summary(request) -> dict[str, object]:
-    """返回顶部总览区摘要数据。"""
-    return dashboard_service.get_summary()
+def summary(request, source: str = "real") -> dict[str, object]:
+    """source: real | fastapi | mock"""
+    return dashboard_service.get_summary(source=source)
 
 
 @api.get("/matrix/{metric}")
-def matrix(request, metric: MetricName) -> dict[str, object]:
-    """返回当前指标页的完整矩阵数据。"""
-    return dashboard_service.get_matrix(metric)
+def matrix(request, metric: MetricName, source: str = "real") -> dict[str, object]:
+    """source: real | fastapi | mock"""
+    return dashboard_service.get_matrix(metric, source=source)
 
 
 @api.get("/history/{gateway_ip}/{sensor_index}")
 def history(request, gateway_ip: str, sensor_index: int, metric: MetricName = "strain") -> dict[str, object]:
-    """返回指定测点最近 10 分钟历史。"""
     return dashboard_service.get_history(gateway_ip, sensor_index, metric)
