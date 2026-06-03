@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>混凝土监测控制台</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+</head>
+<body data-default-metric="{{ default_metric }}" data-refresh-ms="{{ refresh_ms }}">
+    <div class="page-shell">
+        <header class="top-bar box">
+            <div class="brand-block">
+                <div class="brand-title-row">
+                    <div class="brand-title">混凝土应变实时监测系统</div>
+                    <div class="brand-actions">
+                        <div class="mock-switch-group">
+                            <span class="mock-side-label is-active" id="mock-label-left">真实数据</span>
+                            <button type="button" class="mock-toggle is-off" id="mock-toggle-button" aria-pressed="false" aria-label="数据源切换">
+                                <span class="mock-toggle-track">
+                                    <span class="mock-toggle-thumb"></span>
+                                </span>
+                            </button>
+                            <span class="mock-side-label" id="mock-toggle-label">测试数据</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="brand-subtitle">多设备 / 多IP / 多指标轮询</div>
+            </div>
+            <div class="summary-grid" id="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">在线网关</div>
+                    <div class="summary-value" id="summary-online">--</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">离线网关</div>
+                    <div class="summary-value" id="summary-offline">--</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">异常测点</div>
+                    <div class="summary-value" id="summary-error">--</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">总测点</div>
+                    <div class="summary-value" id="summary-sensors">--</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="metric-tabs box">
+            <div class="tab-row" id="tab-row">
+                {% for metric, label in metrics %}
+                <button class="tab-button{% if metric == default_metric %} is-active{% endif %}" data-metric="{{ metric }}">
+                    {{ label }}
+                </button>
+                {% endfor %}
+            </div>
+            <div class="status-line">
+                <span>当前指标：<strong id="current-metric-label">应变</strong></span>
+                <span>量程：<strong id="metric-range">--</strong></span>
+                <span>数据源：<strong id="data-source">--</strong></span>
+                <span>最后刷新：<strong id="last-updated">--</strong></span>
+            </div>
+        </section>
+
+        <main class="main-grid">
+            <section class="matrix-panel box">
+                <div class="panel-title-row">
+                    <div class="panel-title">实时矩阵</div>
+                    <div class="panel-note">每行一个 IP，每行 16 个测点</div>
+                </div>
+                <div class="matrix-shell">
+                    <div class="matrix-header">
+                        <div class="gateway-label-head">Gateway IP</div>
+                        <div class="sensor-header-grid">
+                            {% for _ in "1234567890123456" %}
+                            <div class="sensor-header-cell">{{ forloop.counter }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="matrix-body" id="matrix-body">
+                        <div class="loading-row">正在加载矩阵数据...</div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="detail-panel box">
+                <div class="panel-title-row">
+                    <div class="panel-title">10 分钟历史</div>
+                </div>
+                <div class="detail-meta" id="detail-meta">
+                    请选择左侧测点查看历史趋势
+                </div>
+                <div class="chart-shell">
+                    <svg class="history-chart" id="history-chart" viewBox="0 0 720 240" preserveAspectRatio="none" aria-label="history chart">
+                        <rect x="0" y="0" width="720" height="240" class="chart-bg"></rect>
+                        <line x1="40" y1="20" x2="40" y2="210" class="chart-axis"></line>
+                        <line x1="40" y1="210" x2="700" y2="210" class="chart-axis"></line>
+                        <line x1="40" y1="115" x2="700" y2="115" class="chart-grid"></line>
+                        <polyline id="history-line" class="history-line" points=""></polyline>
+                        <text x="44" y="24" class="axis-label" id="chart-max-label">max</text>
+                        <text x="44" y="208" class="axis-label" id="chart-min-label">min</text>
+                    </svg>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="{% static 'app/js/dashboard.js' %}"></script>
+</body>
+</html>

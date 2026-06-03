@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Gateway-01",
+    "ip": "10.54.79.201",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-02",
+    "ip": "10.54.79.202",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-03",
+    "ip": "10.54.79.203",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-04",
+    "ip": "10.54.79.204",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-05",
+    "ip": "10.54.79.205",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-06",
+    "ip": "10.54.79.206",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-07",
+    "ip": "10.54.79.207",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-08",
+    "ip": "10.54.79.208",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-09",
+    "ip": "10.54.79.209",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-10",
+    "ip": "10.54.79.210",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-11",
+    "ip": "10.54.79.211",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-12",
+    "ip": "10.54.79.212",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-13",
+    "ip": "10.54.79.213",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-14",
+    "ip": "10.54.79.214",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-15",
+    "ip": "10.54.79.215",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-16",
+    "ip": "10.54.79.216",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-17",
+    "ip": "10.54.79.217",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-18",
+    "ip": "10.54.79.218",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-19",
+    "ip": "10.54.79.219",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  },
+  {
+    "name": "Gateway-20",
+    "ip": "10.54.79.220",
+    "port": 502,
+    "slave_id": 1,
+    "poll_interval_ms": 1000
+  }
+]
